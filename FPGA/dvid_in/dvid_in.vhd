@@ -16,20 +16,25 @@ library UNISIM;
 use UNISIM.VComponents.all;
 
 entity dvid_in is
-    Port ( -- DVI-D/HDMI signals
-           tmds_in_p : in  STD_LOGIC_VECTOR(3 downto 0);
-           tmds_in_n : in  STD_LOGIC_VECTOR(3 downto 0);
-           -- debug
-           leds     : out std_logic_vector(7 downto 0) := (others => '0');
-           -- VGA signals
-           clk_pixel : out std_logic;
-           red_p     : out std_logic_vector(7 downto 0) := (others => '0');
-           green_p   : out std_logic_vector(7 downto 0) := (others => '0');
-           blue_p    : out std_logic_vector(7 downto 0) := (others => '0');
-           hsync     : out std_logic := '0';
-           vsync     : out std_logic := '0';
-           blank     : out std_logic := '0'
-         );
+    Port (
+        -- DVI-D/HDMI signals
+        tmds_in_p : in  STD_LOGIC_VECTOR(3 downto 0);
+        tmds_in_n : in  STD_LOGIC_VECTOR(3 downto 0);
+        -- debug
+        leds      : out std_logic_vector(7 downto 0) := (others => '0');
+        -- Clocking
+        clk_x1    : out std_logic;
+        clk_x2    : out std_logic;
+        clk_x10   : out std_logic;
+        strobe    : out std_logic;
+        -- VGA signals
+        red_p     : out std_logic_vector(7 downto 0) := (others => '0');
+        green_p   : out std_logic_vector(7 downto 0) := (others => '0');
+        blue_p    : out std_logic_vector(7 downto 0) := (others => '0');
+        hsync     : out std_logic := '0';
+        vsync     : out std_logic := '0';
+        blank     : out std_logic := '0'
+    );
 end dvid_in;
 
 architecture Behavioral of dvid_in is
@@ -38,7 +43,6 @@ architecture Behavioral of dvid_in is
    signal ioclock              : std_logic;
    signal serdes_strobe        : std_logic;
 
-      
    signal clock_x1             : std_logic;
    signal clock_x2             : std_logic;
    signal clock_x10            : std_logic;
@@ -103,7 +107,11 @@ begin
    ----------------------------------
    -- Output the decoded VGA signals
    ----------------------------------
-   clk_pixel <= clock_x1;
+   clk_x1  <= clock_x1;
+   clk_x2  <= clock_x2;
+   clk_x10 <= clock_x10;
+   strobe  <= serdes_strobe;
+
    blue_p  <= c0_d;
    green_p <= c1_d;
    red_p   <= c2_d;

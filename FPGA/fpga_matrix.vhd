@@ -47,9 +47,13 @@ architecture Behavioral of fpga_matrix is
 
 	signal rst       : std_logic;
 
+    -- Video clocks
+	signal clk_x1    : std_logic;
+	signal clk_x2    : std_logic;
+	signal clk_x10   : std_logic;
+	signal strobe    : std_logic;
+
     -- Video signals
-	signal clk_pixel : std_logic;
-   
     signal i_red     : std_logic_vector(7 downto 0);
     signal i_green   : std_logic_vector(7 downto 0);
     signal i_blue    : std_logic_vector(7 downto 0);
@@ -107,9 +111,13 @@ begin
         tmds_in_p => hdmi_in_p,
         tmds_in_n => hdmi_in_n,
 
-        leds => leds,
+        leds      => leds,
 
-        clk_pixel => clk_pixel,
+        clk_x1    => clk_x1,
+        clk_x2    => clk_x2,
+        clk_x10   => clk_x10,
+        strobe    => strobe,
+
         red_p     => i_red,
         green_p   => i_green,
         blue_p    => i_blue,
@@ -122,7 +130,7 @@ begin
     -- Fill the framebuffer from the HDMI signal
     --------------------------------------------
 	Inst_display: entity work.display port map (
-        clk_pixel => clk_pixel,
+        clk_pixel => clk_x1,
         i_red     => i_red,
         i_green   => i_green,
         i_blue    => i_blue,
@@ -146,7 +154,7 @@ begin
     -- Convert the VGA signals to the DVI-D/TMDS output 
     ---------------------------------------------------
     Inst_dvid_out: entity work.dvid_out port map (
-        clk_pixel  => clk_pixel,
+        clk_pixel  => clk_x1,
 
         red_p      => o_red,
         green_p    => o_green,
@@ -164,13 +172,13 @@ begin
     -------------------------------------
     Inst_memory: entity work.memory port map (
         -- Writing side
-        wr_clk    => clk_pixel,
+        wr_clk    => clk_x1,
         wr_enable => wr_enable,
         wr_addr   => wr_addr,
         wr_data   => wr_data,
 
         -- Reading side
-        rd_clk    => clk_pixel,
+        rd_clk    => clk_x1,
         rd_addr   => rd_addr,
         rd_data   => rd_data
     );
@@ -180,7 +188,7 @@ begin
     -----------------------
     Inst_ledctrl: entity work.ledctrl port map (
         rst      => rst,
-        clk_in   => clk_pixel,
+        clk_in   => clk_x1,
 
         -- Connection to LED panel
         rgb1(2)  => port_a(0),
@@ -202,9 +210,9 @@ begin
     ------------------------
     -- Output clk_pixel / 16
     ------------------------
-    process(clk_pixel)
+    process(clk_x1)
     begin
-        if rising_edge(clk_pixel) then
+        if rising_edge(clk_x1) then
             clk_count <= clk_count + 1;
             if clk_count = "000" then
                 clk_out <= not clk_out;

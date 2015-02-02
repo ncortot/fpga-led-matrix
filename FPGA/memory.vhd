@@ -67,21 +67,7 @@ begin
         if (rising_edge(rd_clk)) then
             rd_data_up := ram_block(conv_integer("0" & rd_addr));
             rd_data_low := ram_block(conv_integer("1" & rd_addr));
-            if (rd_addr(10 downto 8) = "000") then
-                if (rd_addr(6 downto 0) = "0000000") then
-                    rd_data <= "100000" & "100000" & "000000" & rd_data_low;
-                elsif (rd_addr(6 downto 0) = "0000001") then
-                    rd_data <= "100000" & "000000" & "000000" & rd_data_low;
-                elsif (rd_addr(6 downto 0) = "1111110") then
-                    rd_data <= "000000" & "100000" & "000000" & rd_data_low;
-                elsif (rd_addr(6 downto 0) = "1111111") then
-                    rd_data <= "000000" & "000000" & "100000" & rd_data_low;
-                else
-                    rd_data <= rd_data_up & rd_data_low;
-                end if;
-            else
-                rd_data <= rd_data_up & rd_data_low;
-            end if;
+            rd_data <= rd_data_up & rd_data_low;
         end if;
     end process;
 

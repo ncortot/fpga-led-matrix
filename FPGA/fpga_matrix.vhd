@@ -178,7 +178,7 @@ begin
         wr_data   => wr_data,
 
         -- Reading side
-        rd_clk    => clk_x1,
+        rd_clk    => clk_x2,
         rd_addr   => rd_addr,
         rd_data   => rd_data
     );

@@ -62,17 +62,15 @@ architecture Behavioral of display is
     -------------------------------
     -- Counters for screen position   
     -------------------------------
-    signal x : STD_LOGIC_VECTOR (10 downto 0);
-    signal y : STD_LOGIC_VECTOR (10 downto 0);
-
-    signal border : std_logic;
+    signal x : std_logic_vector(10 downto 0);
+    signal y : std_logic_vector(10 downto 0);
 
     signal addr : std_logic_vector(ADDR_WIDTH - 1 downto 0);
 
 begin
 
     -- Address for 128x32 display
-    addr <= std_logic_vector(unsigned(y(4 downto 0) & x(6 downto 0)) - 1);
+    addr <= y(4 downto 0) & x(6 downto 0);
 
     process(clk_pixel)
         variable m_red, m_green, m_blue : std_logic_vector(PIXEL_DEPTH - 1 downto 0);
@@ -81,7 +79,7 @@ begin
         if rising_edge(clk_pixel) then
             wr_enable <= '0';
 
-            if a_blank = '0' and unsigned(x) <= IMG_WIDTH and unsigned(y) < IMG_HEIGHT then
+            if a_blank = '0' and unsigned(x) < IMG_WIDTH and unsigned(y) < IMG_HEIGHT then
                 m_red := a_red(a_red'high downto a_red'high - PIXEL_DEPTH + 1);
                 m_green := a_green(a_green'high downto a_green'high - PIXEL_DEPTH + 1);
                 m_blue := a_blue(a_blue'high downto a_blue'high - PIXEL_DEPTH + 1);
@@ -93,16 +91,9 @@ begin
                 wr_data <= data;
             end if;
 
-            if a_blank = '0' and border = '1' then
-                o_red     <= (others => '0');
-                o_green   <= (others => '1');
-                o_blue    <= (others => '0');
-            else
-                o_red     <= a_red;
-                o_green   <= a_green;
-                o_blue    <= a_blue;
-            end if;
-
+            o_red     <= a_red;
+            o_green   <= a_green;
+            o_blue    <= a_blue;
             o_blank   <= a_blank;
             o_hsync   <= a_hsync;
             o_vsync   <= a_vsync;
@@ -114,17 +105,6 @@ begin
             a_hsync   <= i_hsync;
             a_vsync   <= i_vsync;
             
-            -- Border around the displayable area
-            border <= '0';
---            if unsigned(x) = 0 or
---               unsigned(x) = 127 or
---               unsigned(x) = 639 or
---               unsigned(y) = 0 or
---               unsigned(y) = 31 or
---               unsigned(y) = 479 then
---                border <= '1';
---            end if;
-
             -- Working out where we are in the screen..
             if i_blank = '1' and i_vsync /= a_vsync then
                 y <= (others => '0');
@@ -137,7 +117,7 @@ begin
             -- Start of the blanking interval?
             if a_blank = '0' and i_blank = '1' then
                 y <= std_logic_vector(unsigned(y) + 1);
-                x <= (others => '0');
+                x <= (others => '1');
             end if;
         end if;
     end process;

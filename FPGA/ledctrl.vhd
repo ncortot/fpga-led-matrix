@@ -93,9 +93,8 @@ begin
             -- the incoming data is latched by the panel (not while being
             -- shifted in), so by then it has been "incremented" to 000
             s_led_addr <= (others => '1');
+            s_ram_addr <= (others => '1');
 
-            s_ram_addr <= (others => '0');
-            --s_ram_addr <= (0 => '1', others => '0');
             s_rgb1 <= (others => '0');
             s_rgb2 <= (others => '0');
         elsif (rising_edge(clk)) then
